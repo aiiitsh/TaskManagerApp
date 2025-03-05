@@ -1,20 +1,49 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useContext } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { AppProvider, AppContext } from './context/AppContext';
+import { LightColors, DarkColors } from './constants/Colors';
 
-export default function App() {
+import HomeScreen from './screens/HomeScreen';
+import TaskDetailScreen from './screens/TaskDetailScreen';
+import OptionsScreen from './screens/OptionsScreen';
+import ProjectScreen from './screens/ProjectScreen';
+
+const Stack = createStackNavigator();
+
+function RootNavigator() {
+  const { theme } = useContext(AppContext);
+  const colors = theme === 'dark' ? DarkColors : LightColors;
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: colors.primary, // Header background adapts to theme
+        },
+        // In light mode, set the header text to white; in dark mode, use the theme's text color
+        headerTintColor: theme === 'light' ? '#fff' : colors.text,
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+        // Center the header title in light mode, left align otherwise
+        headerTitleAlign: theme === 'light' ? 'center' : 'left',
+      }}
+    >
+      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="TaskDetail" component={TaskDetailScreen} options={{ title: 'Task Details' }} />
+      <Stack.Screen name="Options" component={OptionsScreen} />
+      <Stack.Screen name="Projects" component={ProjectScreen} options={{ title: 'Select Project' }} />
+    </Stack.Navigator>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default function App() {
+  return (
+    <AppProvider>
+      <NavigationContainer>
+        <RootNavigator />
+      </NavigationContainer>
+    </AppProvider>
+  );
+}
